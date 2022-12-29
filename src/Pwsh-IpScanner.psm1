@@ -18,7 +18,7 @@ function Scan-IpAddress {
     Scan-IpAddress -IpAddress 192.168.1.2 - Port 25565
     
     .NOTES
-    A file named "report-ipscan.txt" (and "report-portscan.txt" if -Port specified) is generated when the command is finished to be executed.
+    A file named "report-ipscan.txt" is generated when the command is finished to be executed.
     #>
 
     [cmdletbinding()]
@@ -29,21 +29,27 @@ function Scan-IpAddress {
         [String]$Port
     )
 
-    $ipResult = Test-Connection -IPv4 $IpAddress -Ping -Quiet
-    if ($ipResult) {
-        "IP: $IpAddress | Status: Up" | Out-File .\report-ipscan.txt -Append
-    } else {
-        "IP: $IpAddress | Status: Down" | Out-File .\report-ipscan.txt -Append
-    }
+    Write-Progress -Activity "Scanning IP address" -Status "$IpAddress" -PercentComplete 0
 
     if ($PSBoundParameters.ContainsKey('Port')) {
         $portResult = Test-Connection -IPv4 $IpAddress -TcpPort $Port -Quiet
         if ($portResult) {
-            "IP: $IpAddress | Port: $Port | Status: Open" | Out-File .\report-portscan.txt -Append
-        } else {
-            "IP: $IpAddress | Port: $Port | Status: Closed" | Out-File .\report-portscan.txt -Append
+            "IP: $IpAddress | Port: $Port | Status: Open" | Out-File .\report-ipscan.txt -Append
+        }
+        else {
+            "IP: $IpAddress | Port: $Port | Status: Closed" | Out-File .\report-ipscan.txt -Append
         }
     }
+    else {
+        $ipResult = Test-Connection -IPv4 $IpAddress -Ping -Quiet
+        if ($ipResult) {
+            "IP: $IpAddress | Status: Up" | Out-File .\report-ipscan.txt -Append
+        }
+        else {
+            "IP: $IpAddress | Status: Down" | Out-File .\report-ipscan.txt -Append
+        }
+    }
+    Write-Progress -Activity "Scanning IP address" -Status "$IpAddress" -PercentComplete 100
 }
 
 function Scan-IpRange {
@@ -72,7 +78,7 @@ function Scan-IpRange {
     Scan-IpRange -StartIP 192.168.1.1 -EndIP 192.168.1.254 -StartPort 1 -EndPort 65535
     
     .NOTES
-    A file named "report-ipscan.txt" (and "report-portscan.txt" if ports are specified) is generated when the command is finished to be executed.
+    A file named "report-ipscan.txt" is generated when the command is finished to be executed.
     #>
 
     [CmdletBinding()]
@@ -90,5 +96,32 @@ function Scan-IpRange {
         [string]$EndPort
     )
 
+    $startIp = [System.Net.IPAddress]::Parse($StartIP).Address
+    $endIp = [System.Net.IPAddress]::Parse($EndIP).Address
+    $startIpLong = [long]$startIp
+    $endIpLong = [long]$endIp
     
+    for ($i = $startIpLong; $i -ge $endIpLong; $i++) {
+        $ip = [System.Net.IPAddress]::Parse($i)
+        $ipResult = Test-Connection -IPv4 $ip -Ping -Quiet
+
+        if ($ipResult) {
+            "IP: $ip | Status: Up" | Out-File .\report-ipscan.txt -Append
+        }
+        else {
+            "IP: $ip | Status: Down" | Out-File .\report-ipscan.txt -Append
+        }
+
+        if ($PSBoundParameters.ContainsKey('StartPort')) {
+            for ($j = $StartPort; $j -ge $EndPort; $j++) {
+                $portResult = Test-Connection -IPv4 $ip -TcpPort $j -Quiet
+                if ($portResult) {
+                    "IP: $ip | Port: $j | Status: Open" | Out-File .\report-portscan.txt -Append
+                }
+                else {
+                    "IP: $ip | Port: $j | Status: Closed" | Out-File .\report-portscan.txt -Append
+                }
+            }
+        }
+    }
 }
