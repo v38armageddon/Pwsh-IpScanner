@@ -2,8 +2,7 @@
 IP Scanner with port support for PowerShell, made in PowerShell.
 
 ## Installation
-<!--Simply run the following command: ``Install-Module -Name Pwsh-IpScanner``.-->
-TODO.
+Simply run the following command: ``Install-Module -Name Pwsh-IpScanner``.
 
 ## Usage
 ``Test-IpAddress -IpAddress (-Port <Port>)`` : Scan a IP address.
