@@ -1,4 +1,4 @@
-function Scan-IpAddress {
+function Test-IpAddress {
     <#
     .SYNOPSIS
     Scan a specific IP Address.
@@ -13,9 +13,9 @@ function Scan-IpAddress {
     Specifies the port number.
     
     .EXAMPLE
-    Scan-IpAddress -IpAddress 1.1.1.1
+    Test-IpAddress -IpAddress 1.1.1.1
     .EXAMPLE
-    Scan-IpAddress -IpAddress 192.168.1.2 - Port 25565
+    Test-IpAddress -IpAddress 192.168.1.2 - Port 25565
     
     .NOTES
     A file named "report-ipscan.txt" is generated when the command is finished to be executed.
@@ -52,7 +52,7 @@ function Scan-IpAddress {
     Write-Progress -Activity "Scanning IP address" -Status "$IpAddress" -PercentComplete 100
 }
 
-function Scan-IpRange {
+function Test-IpRange {
     <#
     .SYNOPSIS
     Scan a range of IP addresses.
@@ -73,9 +73,9 @@ function Scan-IpRange {
     Give the last port to be scanned.
 
     .EXAMPLE
-    Scan-IpRange -StartIP 192.168.1.1 -EndIP 192.168.1.254
+    Test-IpRange -StartIP 192.168.1.1 -EndIP 192.168.1.254
     .EXAMPLE
-    Scan-IpRange -StartIP 192.168.1.1 -EndIP 192.168.1.254 -StartPort 1 -EndPort 65535
+    Test-IpRange -StartIP 192.168.1.1 -EndIP 192.168.1.254 -StartPort 1 -EndPort 65535
     
     .NOTES
     A file named "report-ipscan.txt" is generated when the command is finished to be executed.
@@ -98,30 +98,37 @@ function Scan-IpRange {
 
     $startIp = [System.Net.IPAddress]::Parse($StartIP).Address
     $endIp = [System.Net.IPAddress]::Parse($EndIP).Address
-    $startIpLong = [long]$startIp
-    $endIpLong = [long]$endIp
-    
-    for ($i = $startIpLong; $i -ge $endIpLong; $i++) {
-        $ip = [System.Net.IPAddress]::Parse($i)
-        $ipResult = Test-Connection -IPv4 $ip -Ping -Quiet
+    $startIpDouble = [double]$startIp
+    $endIpDouble = [double]$endIp
 
-        if ($ipResult) {
-            "IP: $ip | Status: Up" | Out-File .\report-ipscan.txt -Append
-        }
-        else {
-            "IP: $ip | Status: Down" | Out-File .\report-ipscan.txt -Append
-        }
+    Write-Progress -Activity "Scanning IP address" -Status "Scan in progress" -PercentComplete 0
 
-        if ($PSBoundParameters.ContainsKey('StartPort')) {
-            for ($j = $StartPort; $j -ge $EndPort; $j++) {
-                $portResult = Test-Connection -IPv4 $ip -TcpPort $j -Quiet
+    if ($PSBoundParameters.ContainsKey('StartPort')) {
+        for ($j = $StartPort; $j -le $EndPort; $j++) {
+            for ($i = $startIpDouble; $i -le $endIpDouble; $i++) {
+                $ip = [System.Net.IPAddress]::Parse($i)
+                $portResult = Test-Connection -IPv4 $ip.ToString() -TcpPort $j -Quiet
                 if ($portResult) {
-                    "IP: $ip | Port: $j | Status: Open" | Out-File .\report-portscan.txt -Append
+                    "IP: $ip | Port: $j | Status: Open" | Out-File .\report-ipscan.txt -Append
                 }
                 else {
-                    "IP: $ip | Port: $j | Status: Closed" | Out-File .\report-portscan.txt -Append
+                    "IP: $ip | Port: $j | Status: Closed" | Out-File .\report-ipscan.txt -Append
                 }
             }
         }
     }
+    else {
+        for ($i = $startIpDouble; $i -le $endIpDouble; $i++) {
+            $ip = [System.Net.IPAddress]::Parse($i)
+            $ipResult = Test-Connection -IPv4 $ip.ToString() -Ping -Quiet
+
+            if ($ipResult) {
+                "IP: $ip | Status: Up" | Out-File .\report-ipscan.txt -Append
+            }
+            else {
+                "IP: $ip | Status: Down" | Out-File .\report-ipscan.txt -Append
+            }
+        }
+    }
+    Write-Progress -Activity "Scanning IP address" -Status "Scan complete" -PercentComplete 100
 }
