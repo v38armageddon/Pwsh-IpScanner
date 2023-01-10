@@ -100,4 +100,4 @@ test/tools/Modules/Microsoft.PowerShell.NamedPipeConnection/
 StartupProfileData-NonInteractive
 
 # Remove result for report files
-src/report-*.txt
+Pwsh-IpScanner/report-ipscan.txt
