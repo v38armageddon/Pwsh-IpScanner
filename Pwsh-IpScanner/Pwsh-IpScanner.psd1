@@ -9,7 +9,7 @@
 @{
 
 # Version number of this module.
-ModuleVersion = '0.0.2'
+ModuleVersion = '0.0.3'
 
 # ID used to uniquely identify this module
 GUID = 'e790d381-af5c-4f67-8384-951d375e823b'
@@ -32,6 +32,9 @@ FunctionsToExport = @('Test-IpAddress', 'Test-IpRange')
 # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
 CmdletsToExport = @('Test-IpAddress', 'Test-IpRange')
 
+# See https://www.reddit.com/r/PowerShell/comments/10ejvyp/comment/j4ryl18/?context=3
+NestedModules = @('Test-IpAddress.psm1', 'Test-IpRange.psm1')
+
 # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
 PrivateData = @{
 
@@ -50,7 +53,7 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Split functions into two files.'
+        ReleaseNotes = 'Fix cmdlets not being detected.'
 
         # Prerelease string of this module
         Prerelease = 'Alpha'
