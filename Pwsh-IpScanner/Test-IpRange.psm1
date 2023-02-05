@@ -50,8 +50,8 @@ function Test-IpRange {
     Write-Progress -Activity "Scanning IP address" -Status "Scan in progress" -PercentComplete 0
 
     if ($PSBoundParameters.ContainsKey('StartPort')) {
-        for ($j = $StartPort; $j -le $EndPort; $j++) {
-            for ($i = $startIpDouble; $i -le $endIpDouble; $i++) {
+        for ($j = $StartPort; $j -ge $EndPort; $j++) {
+            for ($i = $startIpDouble; $i -ge $endIpDouble; $i++) {
                 $ip = [System.Net.IPAddress]::Parse($i)
                 $portResult = Test-Connection -IPv4 $ip.ToString() -TcpPort $j -Quiet
                 if ($portResult) {
@@ -64,7 +64,7 @@ function Test-IpRange {
         }
     }
     else {
-        for ($i = $startIpDouble; $i -le $endIpDouble; $i++) {
+        for ($i = $startIpDouble; $i -ge $endIpDouble; $i++) {
             $ip = [System.Net.IPAddress]::Parse($i)
             $ipResult = Test-Connection -IPv4 $ip.ToString() -Ping -Quiet
 
