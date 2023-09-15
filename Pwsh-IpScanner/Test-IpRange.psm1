@@ -20,6 +20,7 @@ function Test-IpRange {
 
     .EXAMPLE
     Test-IpRange -StartIP 192.168.1.1 -EndIP 192.168.1.254
+    
     .EXAMPLE
     Test-IpRange -StartIP 192.168.1.1 -EndIP 192.168.1.254 -StartPort 1 -EndPort 65535
     
@@ -36,42 +37,40 @@ function Test-IpRange {
         [string]$EndIP,
 
         [Parameter(Mandatory=$false)]
-        [string]$StartPort,
+        [int]$StartPort,
 
         [Parameter(Mandatory=$false)]
-        [string]$EndPort
+        [int]$EndPort
     )
 
-    $ipStart = [System.Net.IPAddress]::Parse($StartIP)
-    $ipEnd = [System.Net.IPAddress]::Parse($EndIP)
-
-    $startIp = [System.BitConverter]::ToUInt32($ipStart.GetAddressBytes(), 0)
-    $endIp = [System.BitConverter]::ToUInt32($ipEnd.GetAddressBytes(), 0)
-
-    Write-Progress -Activity "Scanning IP address" -Status "Scan in progress" -PercentComplete 0
-
     if ($PSBoundParameters.ContainsKey('StartPort')) {
-        # Scan IP range and port range
-        $portrange = $StartPort..$EndPort
-        $iprange = $startIp..$endIp
-        $result = $iprange | foreach-object {
-            $ip = ([System.Net.IPAddress]::Parse([System.Net.IPAddress]::Parse($_).GetAddressBytes())) 
-            Test-NetConnection $ip -port $portrange
-            "IP: $ip | Port: $portrange | Result: $result" | Out-File .\report-ipscan.txt -Append
-            $percentComplete = ((($_ - $startIp) / ($endIp - $startIp)) * 100)
-            Write-Progress -Activity "Scanning IP address" -Status "Scan in progress" -PercentComplete $percentComplete
+        for ($j = $StartPort; $j -le $EndPort; $j++) {
+            Write-Progress -Activity "Scanning IP address" -Status "Scan in progress" -PercentComplete 0
+            for ($i = [IPAddress]::Parse($StartIP); $i.Address -le [IPAddress]::Parse($EndIP).Address; $i = [IPAddress]::Parse($i.Address + 1)) {
+                $ip = $i.ToString()
+                $portResult = Test-Connection -TargetName $ip -TcpPort $j -Quiet
+                if ($portResult) {
+                    "IP: $($ip) | Port: $j | Status: Open" | Out-File .\report-ipscan.txt -Append
+                }
+                else {
+                    "IP: $($ip) | Port: $j | Status: Closed" | Out-File .\report-ipscan.txt -Append
+                }
+            }
+            Write-Progress -Activity "Scanning IP address" -Status "Scan complete" -PercentComplete 100
         }
     }
     else {
-        # Scan IP range
-        $iprange = $startIp..$endIp
-        $result = $iprange | foreach-object {
-            $ip = ([System.Net.IPAddress]::Parse([System.Net.IPAddress]::Parse($_).GetAddressBytes()))
-            Test-NetConnection $ip
-            "IP: $ip | Result: $result" | Out-File .\report-ipscan.txt -Append
-            $percentComplete = ((($_ - $startIp) / ($endIp - $startIp)) * 100)
-            Write-Progress -Activity "Scanning IP address" -Status "Scan in progress" -PercentComplete $percentComplete
+        for ($i = [IPAddress]::Parse($StartIP); $i.Address -le [IPAddress]::Parse($EndIP).Address; $i = [IPAddress]::Parse($i.Address + 1)) {
+            Write-Progress -Activity "Scanning IP address" -Status "Scan in progress" -PercentComplete 0
+            $ip = $i.ToString()
+            $ipResult = Test-Connection -TargetName $ip -Ping -Quiet
+            if ($ipResult) {
+                "IP: $ip | Status: Up" | Out-File .\report-ipscan.txt -Append
+            }
+            else {
+                "IP: $ip | Status: Down" | Out-File .\report-ipscan.txt -Append
+            }
+            Write-Progress -Activity "Scanning IP address" -Status "Scan complete" -PercentComplete 100
         }
     }
-    Write-Progress -Activity "Scanning IP address" -Status "Scan complete" -PercentComplete 100
 }
