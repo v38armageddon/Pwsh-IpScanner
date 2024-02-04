@@ -9,7 +9,7 @@
 @{
 
 # Version number of this module.
-ModuleVersion = '0.0.3'
+ModuleVersion = '1.0.0'
 
 # ID used to uniquely identify this module
 GUID = 'e790d381-af5c-4f67-8384-951d375e823b'
@@ -53,13 +53,13 @@ PrivateData = @{
         # IconUri = ''
 
         # ReleaseNotes of this module
-        ReleaseNotes = 'Fix cmdlets not being detected.'
+        ReleaseNotes = 'Rewrite completly the Test-IpRange Module.'
 
         # Prerelease string of this module
-        Prerelease = 'Alpha'
+        #Prerelease = 'Alpha'
 
         # Flag to indicate whether the module requires explicit user acceptance for install/update/save
-        # RequireLicenseAcceptance = $false
+        RequireLicenseAcceptance = $true
 
         # External dependent modules of this module
         # ExternalModuleDependencies = @()
