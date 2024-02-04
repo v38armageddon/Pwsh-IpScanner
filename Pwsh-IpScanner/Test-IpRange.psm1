@@ -34,10 +34,10 @@ function Test-IpRange {
         [string]$EndIP,
 
         [Parameter(Mandatory=$false)]
-        [string]$StartPort,
+        [int]$StartPort,
 
         [Parameter(Mandatory=$false)]
-        [string]$EndPort
+        [int]$EndPort
     )
     
     $ipStart = [System.Net.IPAddress]::Parse($StartIP)
@@ -78,5 +78,4 @@ function Test-IpRange {
             "IP: $ipString | Status: $status" | Out-File -FilePath "report-ipscan.txt" -Append
         }
     }
-    Write-Progress -Activity "Scanning IP address" -Status "Scan complete" -PercentComplete 100
 }

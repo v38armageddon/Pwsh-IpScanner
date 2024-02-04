@@ -14,6 +14,7 @@ function Test-IpAddress {
     
     .EXAMPLE
     Test-IpAddress -IpAddress 1.1.1.1
+    
     .EXAMPLE
     Test-IpAddress -IpAddress 192.168.1.2 - Port 25565
     
@@ -30,7 +31,7 @@ function Test-IpAddress {
     )
 
     Write-Progress -Activity "Scanning IP address" -Status "$IpAddress" -PercentComplete 0
-
+    # If the user specify a port number, we will test the connection with this port number.
     if ($PSBoundParameters.ContainsKey('Port')) {
         $portResult = Test-Connection -IPv4 $IpAddress -TcpPort $Port -Quiet
         if ($portResult) {
@@ -41,6 +42,7 @@ function Test-IpAddress {
         }
     }
     else {
+        # Do a regular ping, duh
         $ipResult = Test-Connection -IPv4 $IpAddress -Ping -Quiet
         if ($ipResult) {
             "IP: $IpAddress | Status: Up" | Out-File .\report-ipscan.txt -Append
