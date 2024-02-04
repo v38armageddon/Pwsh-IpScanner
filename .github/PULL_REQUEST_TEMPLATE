@@ -1,0 +1,20 @@
+## Description
+Please, describe why this change need to be pulled on Pwsh-IpScanner.
+
+## Utility
+How this change gonna be useful?
+
+## Tests
+Please check the tests that you have made.
+<!--Mark a X in the brackets to check-->
+- [ ] Pwsh-IpScanner can scan a IP
+- [ ] Pwsh-IpScanner can scan a IP and a port
+- [ ] Pwsh-IpScanner can scan multiples IPs
+- [ ] Pwsh-IpScanner can scan multiples IPs and a port
+
+## Checklist:
+<!--Mark a X in the brackets to check-->
+- [ ] My code follows the style guidelines of this project
+- [ ] My code respect the code of conduct
+- [ ] I have performed a self-review of my own code
+- [ ] My changes generate no new warnings or errors
