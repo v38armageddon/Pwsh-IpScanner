@@ -21,7 +21,7 @@ Author = 'v38armageddon'
 CompanyName = 'v38armageddon'
 
 # Copyright statement for this module
-Copyright = '(c) v38armageddon. All rights reserved.'
+Copyright = '(c) 2023 - 2024 - v38armageddon - All rights reserved.'
 
 # Description of the functionality provided by this module
 Description = 'IP Scanner for PowerShell, made in PowerShell.'

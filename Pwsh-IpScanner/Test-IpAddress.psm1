@@ -30,6 +30,12 @@ function Test-IpAddress {
         [String]$Port
     )
 
+    # Detect if the PowerShell version is 7.0 or higher
+    if ($PSVersionTable.PSVersion.Major -lt 7) {
+        Write-Error "This script requires PowerShell 7.0 or higher."
+        return 255
+    }
+
     Write-Progress -Activity "Scanning IP address" -Status "$IpAddress" -PercentComplete 0
     # If the user specify a port number, we will test the connection with this port number.
     if ($PSBoundParameters.ContainsKey('Port')) {

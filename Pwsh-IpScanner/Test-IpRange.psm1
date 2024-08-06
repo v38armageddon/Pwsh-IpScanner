@@ -39,6 +39,12 @@ function Test-IpRange {
         [Parameter(Mandatory=$false)]
         [int]$EndPort
     )
+
+    # Detect if the PowerShell version is 7.0 or higher
+    if ($PSVersionTable.PSVersion.Major -lt 7) {
+        Write-Error "This script requires PowerShell 7.0 or higher."
+        return 255
+    }
     
     $ipStart = [System.Net.IPAddress]::Parse($StartIP)
     $ipEnd = [System.Net.IPAddress]::Parse($EndIP)
