@@ -1,5 +1,4 @@
-function Test-IpAddress {
-    <#
+<#
     .SYNOPSIS
     Scan a specific IP Address.
     
@@ -20,8 +19,8 @@ function Test-IpAddress {
     
     .NOTES
     A file named "report-ipscan.txt" is generated when the command is finished to be executed.
-    #>
-
+#>
+function Test-IpAddress {
     [cmdletbinding()]
     param(
         [parameter(Mandatory=$true)]
