@@ -49,10 +49,27 @@ function Test-IpRange {
     $ipStart = [System.Net.IPAddress]::Parse($StartIP)
     $ipEnd = [System.Net.IPAddress]::Parse($EndIP)
 
+    # Check if the IP addresses range is valid (we check only the private IP addresses)
+    $privateRanges = @(
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "192.168.0.0/16"
+    )
+    foreach ($range in $privateRanges) {
+        if (Test-IpInRange -Ip $startIp -Range $range -and Test-IpInRange -Ip $endIp -Range $range) {
+            return $true
+        }
+    }
+    throw "[ERROR] Only IP addresses in the private range are allowed."
+
     Write-Progress -Activity "Scanning IP address" -Status "Scan in progress" -PercentComplete 0
 
-    $ipRange = [System.Net.IPAddress]::GetAddressBytes($ipStart)..[System.Net.IPAddress]::GetAddressBytes($ipEnd) | ForEach-Object {
-        [System.Net.IPAddress]::Parse($_)
+    $ipRange = @()
+    $currentIp = [System.Net.IPAddress]::Parse($StartIP)
+    while ($currentIp -le $ipEnd) {
+        $ipRange += $currentIp.ToString()
+        $currentIp = [System.Net.IPAddress]::Parse(($currentIp.GetAddressBytes() | ForEach-Object { $_ }) -join ".")
+        $currentIp = [System.Net.IPAddress]::Parse(([System.BitConverter]::ToUInt32($currentIp.GetAddressBytes(), 0) + 1).ToString())
     }
 
     if ($PSBoundParameters.ContainsKey('StartPort')) {
@@ -60,28 +77,31 @@ function Test-IpRange {
         $portEnd = [int]$EndPort
 
         foreach ($ipAddress in $ipRange) {
-            $ipString = $ipAddress.ToString()
+            Write-Progress -Activity "Scanning IP address" -Status "Scan in progress" -PercentComplete ($ipRange.IndexOf($ipAddress) / $ipRange.Count * 100)
             $portStart..$portEnd | ForEach-Object {
                 $port = $_
-                $socket = New-Object System.Net.Sockets.TcpClient
-                try {
-                    $socket.Connect($ipString, $port)
-                    $status = if ($socket.Connected) { "Open" } else { "Closed" }
+                $portResult = Test-Connection -IPv4 $ipAddress -TcpPort $port -Count 1 -Quiet
+                if ($portResult) {
+                    "IP: $ipAddress | Port: $port | Status: Open" | Out-File -FilePath "report-ipscan.txt" -Append
                 }
-                catch {
-                    $status = "Error"
+                else {
+                    "IP: $ipAddress | Port: $port | Status: Closed" | Out-File -FilePath "report-ipscan.txt" -Append
                 }
-                "IP: $ipString | Port: $port | Status: $status" | Out-File -FilePath "report-ipscan.txt" -Append
             }
         }
+        Write-Progress -Activity "Scanning IP address" -Status "Scan in progress" -PercentComplete 100
     }
     else {
         foreach ($ipAddress in $ipRange) {
-            $ipString = $ipAddress.ToString()
-            $ping = New-Object System.Net.NetworkInformation.Ping
-            $socket = $ping.Send($ipString)
-            $status = if ($socket.Status -eq "Success") { "Up" } else { "Down" }
-            "IP: $ipString | Status: $status" | Out-File -FilePath "report-ipscan.txt" -Append
+            Write-Progress -Activity "Scanning IP address" -Status "Scan in progress" -PercentComplete ($ipRange.IndexOf($ipAddress) / $ipRange.Count * 100)
+            $ipStatus = Test-Connection -IPv4 $ipAddress -Count 1 -Quiet
+            if ($ipStatus) {
+                "IP: $ipAddress | Status: Up" | Out-File -FilePath "report-ipscan.txt" -Append
+            }
+            else {
+                "IP: $ipAddress | Status: Down" | Out-File -FilePath "report-ipscan.txt" -Append
+            }
         }
+        Write-Progress -Activity "Scanning IP address" -Status "Scan in progress" -PercentComplete 100
     }
 }
