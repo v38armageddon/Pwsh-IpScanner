@@ -26,13 +26,13 @@
     Description = 'IP Scanner for PowerShell, made in PowerShell.'
 
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = @('Test-IpAddress', 'Test-IpRange')
+    FunctionsToExport = @('Test-IpAddress')
 
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    CmdletsToExport = @('Test-IpAddress', 'Test-IpRange')
+    CmdletsToExport = @('Test-IpAddress')
 
     # See https://www.reddit.com/r/PowerShell/comments/10ejvyp/comment/j4ryl18/?context=3
-    NestedModules = @('Test-IpAddress.psm1', 'Test-IpRange.psm1')
+    NestedModules = @('Test-IpAddress.psm1')
 
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
     PrivateData = @{
@@ -50,7 +50,7 @@
             # IconUri = ''
 
             # ReleaseNotes of this module
-            ReleaseNotes = 'Rewrite completly the Test-IpRange Module.'
+            ReleaseNotes = 'Updated functionality of the Test-IpAddress Module.'
 
             # Prerelease string of this module
             # Prerelease = 'Alpha'
