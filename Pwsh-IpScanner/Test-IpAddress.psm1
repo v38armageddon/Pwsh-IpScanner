@@ -1,5 +1,4 @@
-function Test-IpAddress {
-    <#
+<#
     .SYNOPSIS
     Scan a specific IP Address.
     
@@ -14,13 +13,14 @@ function Test-IpAddress {
     
     .EXAMPLE
     Test-IpAddress -IpAddress 1.1.1.1
+    
     .EXAMPLE
     Test-IpAddress -IpAddress 192.168.1.2 - Port 25565
     
     .NOTES
     A file named "report-ipscan.txt" is generated when the command is finished to be executed.
-    #>
-
+#>
+function Test-IpAddress {
     [cmdletbinding()]
     param(
         [parameter(Mandatory=$true)]
@@ -29,8 +29,14 @@ function Test-IpAddress {
         [String]$Port
     )
 
-    Write-Progress -Activity "Scanning IP address" -Status "$IpAddress" -PercentComplete 0
+    # Detect if the PowerShell version is 7.0 or higher
+    if ($PSVersionTable.PSVersion.Major -lt 7) {
+        Write-Error "This script requires PowerShell 7.0 or higher."
+        return 255
+    }
 
+    Write-Progress -Activity "Scanning IP address" -Status "$IpAddress" -PercentComplete 0
+    # If the user specify a port number, we will test the connection with this port number.
     if ($PSBoundParameters.ContainsKey('Port')) {
         $portResult = Test-Connection -IPv4 $IpAddress -TcpPort $Port -Quiet
         if ($portResult) {
@@ -41,6 +47,7 @@ function Test-IpAddress {
         }
     }
     else {
+        # Do a regular ping, duh
         $ipResult = Test-Connection -IPv4 $IpAddress -Ping -Quiet
         if ($ipResult) {
             "IP: $IpAddress | Status: Up" | Out-File .\report-ipscan.txt -Append
