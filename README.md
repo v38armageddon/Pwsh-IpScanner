@@ -4,6 +4,8 @@
 
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/v38armageddon/Pwsh-IpScanner/pwsh-publish.yml?style=for-the-badge)
 
+⚠️ This project has reached its end of life and will be no longer maintained! Reason: Resources are now being redirected to higher-priority initiatives.
+
 IP Scanner with port support for PowerShell, made in PowerShell.
 
 ## Installation
